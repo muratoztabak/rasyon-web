@@ -1,0 +1,18 @@
+{
+  "name": "Topaloğlu Rasyon Programı",
+  "short_name": "Rasyon",
+  "description": "Sığır rasyonu hesaplama ve öğün paylaştırma programı.",
+  "lang": "tr",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f6f4",
+  "theme_color": "#730b0b",
+  "icons": [
+    { "src": "./ikon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./ikon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./ikon-maskelenebilir.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
