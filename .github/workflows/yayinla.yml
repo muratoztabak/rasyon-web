@@ -1,0 +1,38 @@
+# Depodaki dosyaları olduğu gibi GitHub Pages'e yayınlar.
+#
+# Derleme YOK: bu depo zaten derlenmiş çıktıdır, kaynak ayrı ve gizli bir
+# depoda durur. Burada yapılan tek şey dosyaları Pages'e taşımak.
+#
+# Pages ayarında Source = "GitHub Actions" seçili olduğu için yayın bu akışla
+# yapılır; depo ayarlarında başka bir şey değiştirmek gerekmez.
+name: Yayınla
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Aynı anda tek yayın: art arda gelen push'lar birbirinin üstüne binmesin.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  yayinla:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.dagit.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: dagit
+        uses: actions/deploy-pages@v4
