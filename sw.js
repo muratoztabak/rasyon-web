@@ -131,3 +131,48 @@ self.addEventListener('fetch', (olay) => {
       }),
   )
 })
+
+/* ---------------------------------------------------------------------
+   BİLDİRİMLER
+
+   Yönetici panelden duyuru gönderdiğinde, program KAPALIYKEN bile telefonun
+   bildirim çalması için gereken iki olay burada.
+
+   Gövde her zaman JSON beklenmiyor: bir sağlayıcı boş ya da düz metin
+   gönderirse `json()` patlar ve bildirim hiç görünmez. Bu yüzden çözümleme
+   korumalı ve her durumda bir bildirim çıkıyor.
+--------------------------------------------------------------------- */
+self.addEventListener('push', (olay) => {
+  let veri = {}
+  try {
+    veri = olay.data ? olay.data.json() : {}
+  } catch {
+    veri = { govde: olay.data ? olay.data.text() : '' }
+  }
+  const baslik = veri.baslik || 'Topaloğlu Rasyon Programı'
+  olay.waitUntil(
+    self.registration.showNotification(baslik, {
+      body: veri.govde || '',
+      icon: './ikon-192.png',
+      badge: './ikon-192.png',
+      // Aynı duyuru iki kez gelirse üst üste yığılmasın.
+      tag: veri.duyuruId ? `duyuru-${veri.duyuruId}` : 'duyuru',
+      data: { duyuruId: veri.duyuruId ?? null },
+    }),
+  )
+})
+
+self.addEventListener('notificationclick', (olay) => {
+  olay.notification.close()
+  /*
+    Program zaten açıksa yeni sekme açmak yerine açık olanı öne getir:
+    ahırdaki kişi aynı programın iki kopyasıyla uğraşmasın.
+  */
+  olay.waitUntil((async () => {
+    const pencereler = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+    for (const p of pencereler) {
+      if (p.url.startsWith(self.registration.scope)) return p.focus()
+    }
+    return self.clients.openWindow(self.registration.scope)
+  })())
+})
